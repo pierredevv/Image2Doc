@@ -1,0 +1,6 @@
+# Archivos y carpetas a ignorar
+.env
+venv/
+__pycache__/
+*.pyc
+credentials/
