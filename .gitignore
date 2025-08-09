@@ -1,4 +1,7 @@
-# Archivos a ignorar
+# Archivos y carpetas a ignorar
 .env
 venv/
+__pycache__/
+*.pyc
+credentials/
 node_modules/
