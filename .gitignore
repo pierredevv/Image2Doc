@@ -1,0 +1,4 @@
+# Archivos a ignorar
+.env
+venv/
+node_modules/
