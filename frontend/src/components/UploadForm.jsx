@@ -4,17 +4,16 @@ import PropTypes from 'prop-types';
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react';
 import LanguageSelector from './LanguageSelector';
 import Uploader from './Uploader';
+import { API_CONFIG, convertImage, checkServerHealth } from '../config/api';
 
 // Configuración por defecto
 const DEFAULT_SUPPORTED_FORMATS = [
   { value: 'docx', label: 'Word (.docx)', extension: 'docx' },
   { value: 'xlsx', label: 'Excel (.xlsx)', extension: 'xlsx' },
-  { value: 'pdf', label: 'PDF (.pdf)', extension: 'pdf' },
   { value: 'txt', label: 'Texto Plano (.txt)', extension: 'txt' }
 ];
 
-const DEFAULT_CONVERT_API = '/api/convert';
-const DEFAULT_SUCCESS_MESSAGE = '¡Conversión completada exitosamente!';
+const DEFAULT_SUCCESS_MESSAGE = API_CONFIG.SUCCESS_MESSAGES.CONVERSION_COMPLETE;
 const DEFAULT_ERROR_MESSAGE = 'Ocurrió un error durante la conversión';
 const DEFAULT_FILENAME = 'documento';
 
@@ -31,9 +30,9 @@ const DEFAULT_FILENAME = 'documento';
  * 
  * @param {Object} props - Propiedades del componente
  * @param {Array} [props.supportedFormats=DEFAULT_SUPPORTED_FORMATS] - Formatos soportados
- * @param {string} [props.convertApi=DEFAULT_CONVERT_API] - URL de la API de conversión
- * @param {string} [props.defaultFormat='docx'] - Formato por defecto
- * @param {string} [props.defaultLanguage='spa'] - Idioma por defecto
+ * @param {string} [props.convertApi] - URL de la API de conversión (opcional, usa config por defecto)
+ * @param {string} [props.defaultFormat=API_CONFIG.DEFAULT_OUTPUT_FORMAT] - Formato por defecto
+ * @param {string} [props.defaultLanguage=API_CONFIG.DEFAULT_LANGUAGE] - Idioma por defecto
  * @param {Function} [props.onSuccess] - Callback en caso de éxito
  * @param {Function} [props.onError] - Callback en caso de error
  * @param {string} [props.successMessage=DEFAULT_SUCCESS_MESSAGE] - Mensaje de éxito
@@ -48,9 +47,9 @@ const DEFAULT_FILENAME = 'documento';
  */
 const UploadForm = ({
   supportedFormats = DEFAULT_SUPPORTED_FORMATS,
-  convertApi = DEFAULT_CONVERT_API,
-  defaultFormat = 'docx',
-  defaultLanguage = 'spa',
+  convertApi,
+  defaultFormat = API_CONFIG.DEFAULT_OUTPUT_FORMAT,
+  defaultLanguage = API_CONFIG.DEFAULT_LANGUAGE,
   onSuccess = (result) => console.log('Conversión exitosa:', result),
   onError = (error) => console.error('Error en conversión:', error),
   successMessage = DEFAULT_SUCCESS_MESSAGE,
@@ -71,6 +70,7 @@ const UploadForm = ({
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState('idle'); // idle | uploading | success | error
   const [error, setError] = useState(null);
+  const [serverStatus, setServerStatus] = useState('checking'); // checking | healthy | unhealthy
   
   // Referencia para abortar operaciones
   const abortControllerRef = useRef(null);
@@ -81,6 +81,16 @@ const UploadForm = ({
     [format, supportedFormats]
   );
   
+  // Verificar estado del servidor al montar
+  useEffect(() => {
+    const checkServer = async () => {
+      const health = await checkServerHealth();
+      setServerStatus(health.isHealthy ? 'healthy' : 'unhealthy');
+    };
+    
+    checkServer();
+  }, []);
+  
   // Validación del archivo
   const validateFile = useCallback(() => {
     if (!file) {
@@ -89,16 +99,14 @@ const UploadForm = ({
     }
     
     // Validar tipo
-    const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-    if (!validTypes.includes(file.type)) {
-      setError('Formato de imagen no soportado. Usa PNG, JPG o JPEG');
+    if (!API_CONFIG.REQUEST_CONFIG.SUPPORTED_FORMATS.includes(file.type)) {
+      setError(API_CONFIG.ERROR_MESSAGES.INVALID_FORMAT);
       return false;
     }
     
-    // Validar tamaño (10MB máximo)
-    const maxSize = 10 * 1024 * 1024;
-    if (file.size > maxSize) {
-      setError(`El archivo excede el tamaño máximo de ${maxSize / (1024 * 1024)}MB`);
+    // Validar tamaño
+    if (file.size > API_CONFIG.REQUEST_CONFIG.MAX_FILE_SIZE) {
+      setError(API_CONFIG.ERROR_MESSAGES.FILE_TOO_LARGE);
       return false;
     }
     
@@ -111,6 +119,13 @@ const UploadForm = ({
     e.preventDefault();
     
     if (!validateFile()) return;
+    
+    // Verificar que el servidor esté disponible
+    if (serverStatus !== 'healthy') {
+      setError(API_CONFIG.ERROR_MESSAGES.NETWORK_ERROR);
+      setStatus('error');
+      return;
+    }
     
     // Cancelar operación anterior si existe
     if (abortControllerRef.current) {
@@ -125,7 +140,7 @@ const UploadForm = ({
     setProgress(0);
     setError(null);
     
-    // Simular progreso (opcional - eliminar si no se quiere)
+    // Simular progreso
     const progressInterval = setInterval(() => {
       setProgress(prev => {
         if (prev >= 95) {
@@ -137,37 +152,43 @@ const UploadForm = ({
     }, 300);
 
     try {
-      const formData = new FormData();
-      formData.append('image', file);
-      formData.append('format', format);
-      formData.append('lang', language);
-      
-      const response = await fetch(convertApi, {
-        method: 'POST',
-        body: formData,
-        signal: controller.signal
+      console.log('Iniciando conversión con:', {
+        file: file.name,
+        format: format,
+        language: language,
+        apiUrl: convertApi || 'config por defecto'
       });
       
-      clearInterval(progressInterval);
-      setProgress(99); // Mostrar casi completo
+      // Usar la función centralizada de conversión
+      const result = await convertImage(file, language, format);
       
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || `Error ${response.status}: ${response.statusText}`);
+      clearInterval(progressInterval);
+      setProgress(99);
+      
+      if (!result.success) {
+        throw new Error(result.error || API_CONFIG.ERROR_MESSAGES.UNKNOWN_ERROR);
       }
       
-      const blob = await response.blob();
+      const responseData = result.data;
+      
+      // Convertir base64 a blob
+      const base64Data = responseData.content;
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: responseData.mime_type });
       const url = URL.createObjectURL(blob);
       
-      // Generar nombre de archivo inteligente
-      const safeFilename = filename
-        .replace(/[^a-z0-9]/gi, '_')
-        .toLowerCase();
+      // Usar el nombre del archivo del servidor
+      const downloadFilename = responseData.filename;
       
       // Descargar archivo
       const link = document.createElement('a');
       link.href = url;
-      link.download = `${safeFilename}.${currentFormat.extension}`;
+      link.download = downloadFilename;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -182,7 +203,8 @@ const UploadForm = ({
       onSuccess({
         format,
         language,
-        filename: `${safeFilename}.${currentFormat.extension}`
+        filename: downloadFilename,
+        textLength: responseData.text_length
       });
       
     } catch (err) {
@@ -193,13 +215,26 @@ const UploadForm = ({
       
       clearInterval(progressInterval);
       setStatus('error');
-      setError(err.message);
+      
+      // Mejorar el manejo de errores
+      let errorMsg = err.message;
+      
+      // Mapear errores específicos
+      if (err.message.includes('Failed to fetch') || err.message.includes('fetch')) {
+        errorMsg = API_CONFIG.ERROR_MESSAGES.NETWORK_ERROR;
+      } else if (err.message.includes('No se pudo extraer texto')) {
+        errorMsg = API_CONFIG.ERROR_MESSAGES.NO_TEXT_EXTRACTED;
+      } else if (err.message.includes('Error del servidor')) {
+        errorMsg = API_CONFIG.ERROR_MESSAGES.SERVER_ERROR;
+      }
+      
+      console.error('Error completo:', err);
+      setError(errorMsg);
       onError(err);
       
       // Mostrar mensaje de error
-      if (errorMessage) {
-        alert(`${errorMessage}: ${err.message}`);
-      }
+      alert(`Error de conversión: ${errorMsg}`);
+      
     } finally {
       setLoading(false);
       abortControllerRef.current = null;
@@ -210,11 +245,11 @@ const UploadForm = ({
     language,
     validateFile,
     convertApi,
+    serverStatus,
     filename,
     currentFormat,
     showSuccessMessage,
     successMessage,
-    errorMessage,
     onSuccess,
     onError
   ]);
@@ -250,6 +285,49 @@ const UploadForm = ({
     };
   }, []);
   
+  // Renderizado del estado del servidor
+  const renderServerStatus = useCallback(() => {
+    if (serverStatus === 'checking') {
+      return (
+        <div className="mb-4 p-2 bg-yellow-50 border border-yellow-200 rounded-md">
+          <div className="flex items-center">
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-500 mr-2"></div>
+            <span className="text-yellow-700 text-sm">Verificando conexión con el servidor...</span>
+          </div>
+        </div>
+      );
+    }
+    
+    if (serverStatus === 'unhealthy') {
+      return (
+        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
+          <div className="flex items-center">
+            <svg className="w-5 h-5 text-red-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+            <div>
+              <p className="text-red-700 text-sm font-medium">Servidor no disponible</p>
+              <p className="text-red-600 text-xs mt-1">
+                Verifica que el backend esté ejecutándose en http://127.0.0.1:8000
+              </p>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    
+    return (
+      <div className="mb-4 p-2 bg-green-50 border border-green-200 rounded-md">
+        <div className="flex items-center">
+          <svg className="w-5 h-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          </svg>
+          <span className="text-green-700 text-sm">Servidor conectado correctamente</span>
+        </div>
+      </div>
+    );
+  }, [serverStatus]);
+  
   // Renderizado del botón principal
   const renderSubmitButton = useCallback(() => {
     if (status === 'success') {
@@ -281,12 +359,14 @@ const UploadForm = ({
       );
     }
     
+    const isDisabled = loading || !file || serverStatus !== 'healthy';
+    
     return (
       <button
         type="submit"
-        disabled={loading || !file}
+        disabled={isDisabled}
         className={`w-full py-3 px-4 rounded-md text-white font-medium transition-colors ${
-          loading || !file
+          isDisabled
             ? 'bg-gray-400 cursor-not-allowed'
             : 'bg-blue-600 hover:bg-blue-700'
         }`}
@@ -294,7 +374,7 @@ const UploadForm = ({
         {loading ? 'Procesando...' : 'Convertir Documento'}
       </button>
     );
-  }, [loading, file, status, error, handleCancel]);
+  }, [loading, file, status, error, handleCancel, serverStatus]);
   
   // Renderizado de la barra de progreso
   const renderProgress = useCallback(() => {
@@ -364,6 +444,9 @@ const UploadForm = ({
       className={`space-y-4 ${className}`}
       noValidate
     >
+      {/* Estado del servidor */}
+      {renderServerStatus()}
+      
       {/* Selector de idioma con props personalizables */}
       <LanguageSelector 
         selectedLanguage={language}
@@ -424,6 +507,7 @@ const UploadForm = ({
       <div className="mt-4 text-xs text-gray-500">
         <p>Soporta: PNG, JPG, JPEG (Max. 10MB)</p>
         <p className="mt-1">Para mejores resultados, usa imágenes claras y bien iluminadas</p>
+        <p className="mt-1">Servidor: {API_CONFIG.BASE_URL}</p>
       </div>
     </form>
   );
@@ -511,9 +595,9 @@ UploadForm.propTypes = {
 // Valores por defecto para props
 UploadForm.defaultProps = {
   supportedFormats: DEFAULT_SUPPORTED_FORMATS,
-  convertApi: DEFAULT_CONVERT_API,
-  defaultFormat: 'docx',
-  defaultLanguage: 'spa',
+  convertApi: API_CONFIG.CONVERT_IMAGE_API,
+  defaultFormat: API_CONFIG.DEFAULT_OUTPUT_FORMAT,
+  defaultLanguage: API_CONFIG.DEFAULT_LANGUAGE,
   onSuccess: (result) => console.log('Conversión exitosa:', result),
   onError: (error) => console.error('Error en conversión:', error),
   successMessage: DEFAULT_SUCCESS_MESSAGE,

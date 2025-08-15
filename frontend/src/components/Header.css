@@ -1,0 +1,267 @@
+/* ===== HEADER COMPONENT STYLES ===== */
+
+/* Mejoras en la transición del header */
+.header {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efecto de scroll mejorado */
+.header.scrolled {
+  background: rgba(15, 15, 35, 0.98);
+  backdrop-filter: blur(30px);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Mejoras en los dropdowns */
+.dropdown-menu {
+  transform-origin: top right;
+}
+
+.dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -0.5rem;
+  right: 1.5rem;
+  width: 1rem;
+  height: 1rem;
+  background: rgba(30, 41, 59, 0.95);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  transform: rotate(45deg);
+  z-index: -1;
+}
+
+/* Mejoras en el campo de búsqueda */
+.search-input:focus {
+  transform: scale(1.02);
+}
+
+.search-trigger:hover {
+  transform: translateY(-2px);
+}
+
+/* Mejoras en los botones de acción */
+.action-btn:active {
+  transform: scale(0.95);
+}
+
+/* Animación de entrada para el header */
+@keyframes headerSlideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.header {
+  animation: headerSlideDown 0.6s ease-out;
+}
+
+/* Mejoras en el logo */
+.logo-section:hover .logo-icon {
+  animation: logoGlow 2s ease-in-out infinite alternate;
+}
+
+@keyframes logoGlow {
+  from {
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+  }
+  to {
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+  }
+}
+
+/* Mejoras en las notificaciones */
+.notification-badge {
+  animation: notificationPulse 2s ease-in-out infinite;
+}
+
+@keyframes notificationPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+/* Mejoras en los dropdowns */
+.dropdown-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.dropdown-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(99, 102, 241, 0.1), transparent);
+  transition: left 0.3s ease;
+}
+
+.dropdown-item:hover::before {
+  left: 100%;
+}
+
+/* Mejoras en el botón de usuario */
+.user-btn:hover .user-chevron {
+  transform: rotate(180deg) scale(1.1);
+}
+
+/* Mejoras en el campo de búsqueda expandido */
+.search-input-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.search-input-wrapper::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6, #a855f7);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.search-input:focus + .search-input-wrapper::after,
+.search-input:focus ~ .search-input-wrapper::after {
+  transform: scaleX(1);
+}
+
+/* Mejoras en la responsividad */
+@media (max-width: 768px) {
+  .header-container {
+    gap: 0.75rem;
+  }
+  
+  .logo-section {
+    gap: 0.75rem;
+  }
+  
+  .logo-icon {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+  
+  .logo-title {
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .header-container {
+    padding: 0 0.5rem;
+  }
+  
+  .header-left {
+    gap: 0.75rem;
+  }
+  
+  .mobile-menu-btn {
+    padding: 0.5rem;
+  }
+  
+  .action-btn {
+    padding: 0.5rem;
+  }
+}
+
+/* Mejoras en el tema claro */
+[data-theme="light"] .header {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(249, 250, 251, 0.95) 100%);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  color: #1e293b;
+}
+
+[data-theme="light"] .header.scrolled {
+  background: rgba(255, 255, 255, 0.98);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme="light"] .logo-title {
+  background: linear-gradient(135deg, #1e40af 0%, #7c3aed 50%, #a855f7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+[data-theme="light"] .action-btn {
+  color: #64748b;
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .action-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1e293b;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .search-input {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #1e293b;
+}
+
+[data-theme="light"] .search-input::placeholder {
+  color: #64748b;
+}
+
+[data-theme="light"] .search-trigger {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #64748b;
+}
+
+[data-theme="light"] .dropdown-menu {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .dropdown-title {
+  color: #1e293b;
+}
+
+[data-theme="light"] .dropdown-subtitle {
+  color: #64748b;
+}
+
+[data-theme="light"] .notification-text {
+  color: #1e293b;
+}
+
+[data-theme="light"] .notification-time {
+  color: #64748b;
+}
+
+[data-theme="light"] .user-name {
+  color: #1e293b;
+}
+
+[data-theme="light"] .user-email {
+  color: #64748b;
+}
+
+[data-theme="light"] .dropdown-item {
+  color: #64748b;
+}
+
+[data-theme="light"] .dropdown-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #1e293b;
+}

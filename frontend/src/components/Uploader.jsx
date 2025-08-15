@@ -1,11 +1,12 @@
 // src/components/Uploader.jsx
 
-import  { 
+import React, { 
   useState, 
   useEffect, 
   useCallback, 
   useRef 
 } from 'react';
+import PropTypes from 'prop-types';
 
 // Configuración por defecto
 const DEFAULT_ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/jpg'];
@@ -218,10 +219,25 @@ const Uploader = ({
   );
 };
 
+// PropTypes para validación
+Uploader.propTypes = {
+  onFileSelected: PropTypes.func.isRequired,
+  selectedFile: PropTypes.object,
+  allowedTypes: PropTypes.array,
+  maxSize: PropTypes.number,
+  onError: PropTypes.func,
+  className: PropTypes.string,
+  label: PropTypes.string,
+  maxFileSizeLabel: PropTypes.string,
+  allowedTypesLabel: PropTypes.string
+};
+
 // Propiedades por defecto para escalabilidad
 Uploader.defaultProps = {
   allowedTypes: DEFAULT_ALLOWED_TYPES,
   maxSize: DEFAULT_MAX_SIZE,
+  onError: (error) => console.error(error),
+  className: '',
   label: "Seleccionar imagen",
   maxFileSizeLabel: "Max. 10MB",
   allowedTypesLabel: "PNG, JPG, JPEG"

@@ -1,13 +1,124 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
+    
+    <!-- SEO y Metadatos -->
+    <title>Sistema OCR Avanzado - Convierte Imágenes a Documentos | Image2Doc</title>
+    <meta name="description" content="Plataforma moderna para conversión de imágenes a documentos digitales usando tecnología OCR avanzada con IA. Convierte a Word, Excel, PDF y texto plano." />
+    <meta name="keywords" content="OCR, reconocimiento óptico de caracteres, convertir imagen a texto, imagen a word, imagen a excel, imagen a pdf, IA, inteligencia artificial" />
+    <meta name="author" content="Image2Doc OCR System" />
+    <meta name="robots" content="index, follow" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://image2doc.com/" />
+    <meta property="og:title" content="Sistema OCR Avanzado - Convierte Imágenes a Documentos" />
+    <meta property="og:description" content="Plataforma moderna para conversión de imágenes a documentos digitales usando tecnología OCR avanzada con IA." />
+    <meta property="og:image" content="https://image2doc.com/og-image.jpg" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://image2doc.com/" />
+    <meta property="twitter:title" content="Sistema OCR Avanzado - Convierte Imágenes a Documentos" />
+    <meta property="twitter:description" content="Plataforma moderna para conversión de imágenes a documentos digitales usando tecnología OCR avanzada con IA." />
+    <meta property="twitter:image" content="https://image2doc.com/twitter-image.jpg" />
+    
+    <!-- Favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    
+    <!-- Preconnect para fuentes y recursos externos -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- Fuentes de Google -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Poppins:wght@400;500;600;700&display=swap" as="style" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- Meta tags adicionales -->
+    <meta name="theme-color" content="#6366f1" />
+    <meta name="msapplication-TileColor" content="#6366f1" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Sistema OCR Avanzado",
+      "description": "Plataforma moderna para conversión de imágenes a documentos digitales usando tecnología OCR avanzada con IA",
+      "url": "https://image2doc.com",
+      "applicationCategory": "ProductivityApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Image2Doc"
+      }
+    }
+    </script>
   </head>
+  
   <body>
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950 transition-opacity duration-500">
+      <div class="text-center">
+        <div class="w-16 h-16 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <h1 class="text-2xl font-bold text-white mb-2">OCR System Pro</h1>
+        <p class="text-gray-400">Cargando sistema...</p>
+      </div>
+    </div>
+    
+    <!-- Root de la aplicación -->
     <div id="root"></div>
+    
+    <!-- Scripts -->
     <script type="module" src="/src/main.jsx"></script>
+    
+    <!-- Script para ocultar loading screen -->
+    <script>
+      window.addEventListener('load', () => {
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+          loadingScreen.style.opacity = '0';
+          setTimeout(() => {
+            loadingScreen.style.display = 'none';
+          }, 500);
+        }
+      });
+      
+      // Fallback si la carga tarda más de 5 segundos
+      setTimeout(() => {
+        const loadingScreen = document.getElementById('loading-screen');
+        if (loadingScreen) {
+          loadingScreen.style.opacity = '0';
+          setTimeout(() => {
+            loadingScreen.style.display = 'none';
+          }, 500);
+        }
+      }, 5000);
+    </script>
+    
+    <!-- Analytics y tracking (opcional) -->
+    <!-- Google Analytics -->
+    <!--
+    <script async src="https://www.googletagmanager.com/gtag/js?id=GA_MEASUREMENT_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
+    -->
   </body>
 </html>

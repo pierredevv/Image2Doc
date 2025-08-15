@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Mejorado - OCR System Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            color: white;
+            min-height: 200vh;
+        }
+
+        .demo-content {
+            padding: 2rem;
+            margin-top: 4.5rem;
+        }
+
+        .demo-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .demo-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #6366f1;
+        }
+
+        .demo-text {
+            line-height: 1.6;
+            color: #a1a1aa;
+        }
+
+        .scroll-indicator {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(99, 102, 241, 0.2);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            color: #6366f1;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Mejorado -->
+    <header class="header fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-slate-900/90 backdrop-blur-lg border-b border-white/5">
+        <div class="header-container">
+            <!-- Logo y título - Lado izquierdo -->
+            <div class="header-left">
+                <button class="mobile-menu-btn" aria-label="Alternar menú lateral">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+                
+                <div class="logo-section">
+                    <div class="logo-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </div>
+                    
+                    <div class="logo-text">
+                        <h1 class="logo-title">OCR System Pro</h1>
+                        <p class="logo-version">v1.0.0</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campo de búsqueda - Centro -->
+            <div class="header-center">
+                <div class="search-container">
+                    <button class="search-trigger" aria-label="Abrir búsqueda">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <span class="search-placeholder">Buscar...</span>
+                        <kbd class="search-shortcut">Ctrl+K</kbd>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Acciones del header - Lado derecho -->
+            <div class="header-right">
+                <!-- Notificaciones -->
+                <div class="header-action-item">
+                    <button class="action-btn notification-btn" aria-label="Notificaciones">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
+                            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
+                        </svg>
+                        <span class="notification-badge"></span>
+                    </button>
+                </div>
+
+                <!-- Configuración -->
+                <div class="header-action-item">
+                    <button class="action-btn" aria-label="Configuración">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Cambio de tema -->
+                <div class="header-action-item">
+                    <button class="action-btn" aria-label="Cambiar a modo claro">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="4"></circle>
+                            <path d="M12 2v2"></path>
+                            <path d="M12 20v2"></path>
+                            <path d="m4.93 4.93 1.41 1.41"></path>
+                            <path d="m17.66 17.66 1.41 1.41"></path>
+                            <path d="M2 12h2"></path>
+                            <path d="M20 12h2"></path>
+                            <path d="m6.34 17.66-1.41 1.41"></path>
+                            <path d="m19.07 4.93-1.41 1.41"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Menú de usuario -->
+                <div class="header-action-item">
+                    <button class="action-btn user-btn" aria-label="Menú de usuario">
+                        <div class="user-avatar">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                        </div>
+                        <svg class="user-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="6,9 12,15 18,9"></polyline>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Indicador de scroll -->
+    <div class="scroll-indicator">
+        Scroll: <span id="scroll-value">0</span>px
+    </div>
+
+    <!-- Contenido de demostración -->
+    <div class="demo-content">
+        <div class="demo-section">
+            <h2 class="demo-title">🚀 Header Mejorado - OCR System Pro</h2>
+            <p class="demo-text">
+                Este es el header completamente rediseñado que soluciona todos los problemas identificados:
+            </p>
+            <ul style="margin-top: 1rem; color: #a1a1aa; line-height: 1.6;">
+                <li>✅ <strong>Proporciones corregidas:</strong> Header con altura consistente de 4.5rem</li>
+                <li>✅ <strong>Alineación perfecta:</strong> Todos los elementos del lado derecho están bien alineados</li>
+                <li>✅ <strong>Campo de búsqueda mejorado:</strong> Diseño moderno con transiciones suaves</li>
+                <li>✅ <strong>Dropdowns atractivos:</strong> Menús con animaciones y efectos visuales</li>
+                <li>✅ <strong>Responsive design:</strong> Se adapta perfectamente a todos los dispositivos</li>
+                <li>✅ <strong>Efectos visuales:</strong> Transiciones, sombras y animaciones fluidas</li>
+            </ul>
+        </div>
+
+        <div class="demo-section">
+            <h2 class="demo-title">🎨 Características del Nuevo Header</h2>
+            <p class="demo-text">
+                <strong>Diseño Moderno:</strong> Utiliza glassmorphism con backdrop-filter y transparencias elegantes.<br>
+                <strong>Animaciones Suaves:</strong> Todas las interacciones tienen transiciones fluidas de 200-500ms.<br>
+                <strong>Iconos Lucide:</strong> Iconografía consistente y moderna para una mejor UX.<br>
+                <strong>Gradientes:</strong> Uso de gradientes sutiles para elementos importantes.<br>
+                <strong>Sombras:</strong> Sistema de sombras coherente para crear profundidad.
+            </p>
+        </div>
+
+        <div class="demo-section">
+            <h2 class="demo-title">📱 Responsive Design</h2>
+            <p class="demo-text">
+                El header se adapta perfectamente a todos los tamaños de pantalla:<br>
+                <strong>Desktop (>1024px):</strong> Layout completo con búsqueda centrada<br>
+                <strong>Tablet (768px-1024px):</strong> Búsqueda más compacta<br>
+                <strong>Mobile (<768px):</strong> Búsqueda oculta, elementos optimizados<br>
+                <strong>Small Mobile (<640px):</strong> Layout ultra-compacto
+            </p>
+        </div>
+
+        <div class="demo-section">
+            <h2 class="demo-title">⚡ Funcionalidades Avanzadas</h2>
+            <p class="demo-text">
+                <strong>Atajos de teclado:</strong> Ctrl+K para búsqueda, Escape para cerrar menús<br>
+                <strong>Scroll inteligente:</strong> Header cambia de apariencia al hacer scroll<br>
+                <strong>Click outside:</strong> Los menús se cierran automáticamente<br>
+                <strong>Focus management:</strong> Navegación por teclado optimizada<br>
+                <strong>Estado persistente:</strong> Los menús mantienen su estado correctamente
+            </p>
+        </div>
+
+        <div class="demo-section">
+            <h2 class="demo-title">🔧 Tecnologías Utilizadas</h2>
+            <p class="demo-text">
+                <strong>React Hooks:</strong> useState, useEffect, useRef para gestión de estado<br>
+                <strong>CSS Moderno:</strong> Grid, Flexbox, CSS Variables, Animaciones CSS<br>
+                <strong>Lucide Icons:</strong> Iconografía moderna y consistente<br>
+                <strong>Tailwind CSS:</strong> Clases utilitarias para layout y espaciado<br>
+                <strong>CSS Custom Properties:</strong> Sistema de variables para temas
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Actualizar indicador de scroll
+        window.addEventListener('scroll', () => {
+            const scrollValue = document.getElementById('scroll-value');
+            scrollValue.textContent = Math.round(window.scrollY);
+        });
+
+        // Simular funcionalidad de los botones
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+
+        // Simular funcionalidad del campo de búsqueda
+        document.querySelector('.search-trigger').addEventListener('click', function() {
+            this.style.transform = 'translateY(-2px)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 200);
+        });
+    </script>
+</body>
+</html>
